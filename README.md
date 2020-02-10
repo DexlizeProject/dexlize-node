@@ -9,7 +9,8 @@ Dexlize is a aggregative decentralized exchange protocol. It adopts aggregation,
 
 ## Submodules
 
-* []
+* [Dexlize](https://github.com/DexlizeProject/dexlize-node/tree/master/frame/dexlize) - dexlize core module
+* [Generic asset gateway](https://github.com/DexlizeProject/dexlize-node/tree/master/frame/generic-asset-gateway) - dexlize asset gateway solution
 
 ## Build
 
