@@ -12,30 +12,30 @@ Deposit module will provide the ability to generate/get the deposit address only
 The deposit info will be provided by federated nodes. Currenlty it plants to use collective module to implement it. It will not solve the problems of fully decentralization of blockchain relay to make it more general.
 
 ### Withdraw Submodule
-Withdraw module will provide the ability to withdraw assets from gateway with request -> approve/reject -> execute -> success process. 
+Withdraw module will provide the ability to withdraw assets from gateway with request -> approve/reject -> execute -> success process.
 
 ## Deposit Process
 
 ### API
 
--- addRecord(origin, who: AccountId, assetType: AssetType, amount: Balance)
--- nextIndex(AssetType)
--- setXPubKey(origin, AssetType)
+- addRecord(origin, who: AccountId, assetType: AssetType, amount: Balance)
+- nextIndex(AssetType)
+- setXPubKey(origin, AssetType)
 
 ### Storage
--- XPubKey(Map(AssetType -> XPubKey))
+- XPubKey(Map(AssetType -> XPubKey))
 
 ## Withdraw Prcocess
 
 ### API
--- requestWithdraw(origin, assetType, toAddress, amount)
+- requestWithdraw(origin, assetType, toAddress, amount)
 
--- approveWithdraw(origin, withdrawId)   (admin requred)
+- approveWithdraw(origin, withdrawId)   (admin requred)
 
--- rejectWithdraw(origin, withdrawId) (admin requried)
+- rejectWithdraw(origin, withdrawId) (admin requried)
 
--- executeWithdraw(origin, withdrawId, txnInfo) (admin required)
+- executeWithdraw(origin, withdrawId, txnInfo) (admin required)
 
 ### Storage
--- blackList(who: AccountId)
--- withdrawHistory(map(withdrawId->withdrawRecord))
+- blackList(who: AccountId)
+- withdrawHistory(map(withdrawId->withdrawRecord))
