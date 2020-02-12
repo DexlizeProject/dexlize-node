@@ -2,7 +2,7 @@
 
 This module is core module of [Dexlize Project](https://github.com/DexlizeProject). It provides the ability to create different types of dex and unified liquidation interface.
 
-To be clear, Dexlize is not just a decentralize exchange, it's aimed to build a dex agreegator. It's more like dex.ag in the ethereum ecosystem and it have more functions.
+To be clear, Dexlize is not just a decentralize exchange, it's aimed to build a dex agreegator. It's more like dex.ag in the ethereum ecosystem and is suitable for the cross-chain ecosystem.
 
 ## Arch
 ### APIs
