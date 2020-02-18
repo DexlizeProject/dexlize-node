@@ -2,10 +2,10 @@
 panic = 'unwind'
 
 [package]
-authors = ['Anonymous']
+authors = ['Dexlize Team<dev@dexlize.org>']
 build = 'build.rs'
 edition = '2018'
-name = 'node-template'
+name = 'dexlize-node'
 version = '2.0.0'
 
 [build-dependencies]
@@ -48,7 +48,7 @@ package = 'sp-finality-grandpa'
 rev = '3e651110aa06aa835790df63410a29676243fc54'
 version = '2.0.0'
 
-[dependencies.node-template-runtime]
+[dependencies.dexlize-node-runtime]
 path = 'runtime'
 version = '2.0.0'
 
@@ -130,5 +130,5 @@ version = '2.0.0'
 members = ['runtime', 'frame/generic-asset-gateway', 'frame/dexlize']
 
 [[bin]]
-name = 'node-template'
+name = 'dexlize-node'
 path = 'src/main.rs'

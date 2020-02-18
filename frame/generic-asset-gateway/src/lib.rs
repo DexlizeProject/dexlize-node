@@ -1,33 +1,108 @@
+// Copyright 2019-2020
+//     by  Dexlize Foundation PTE Ltd.
+// This file is part of Dexlize Project.
+
+// Substrate is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+//! # Generic Asset Gateway Module
+//!
+//! The Generic Asset module provides functionality for handling basic process of deposit and withdraw.
+//!
+//! ## Overview
+//!
+//! The Generic Asset Gateway module provides functions for:
+//!
+//! - Creating a new kind of asset.
+//! - 
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
-/// A pallet template with necessary imports
-
-/// Feel free to remove or edit this file as needed.
-/// If you change the name of this file, make sure to update its references in runtime/src/lib.rs
-/// If you remove this file, you can remove those references
-
-
-/// For more guidance on FRAME pallets, see the example.
-/// https://github.com/paritytech/substrate/blob/master/frame/example/src/lib.rs
-
-use frame_support::{decl_module, decl_storage, decl_event, dispatch::DispatchResult};
+#[allow(unused_imports)]
+use codec::{Decode, Encode, Error as codecErr, HasCompact, Input, Output};
+use sp_std::prelude::*;
+use sp_core::H256;
+use frame_support::{Parameter, decl_module, decl_storage, decl_event, dispatch::DispatchResult};
+use sp_runtime::traits::{Member, SimpleArithmetic, Zero, StaticLookup};
 use system::ensure_signed;
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
+
+#[derive(Encode, Decode, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "std", derive(Debug, Serialize, Deserialize))]
+pub enum DepositStatus {
+	Pending,
+	Confirmed,
+	Completed
+}
+impl Default for DepositStatus {
+    fn default() -> Self {
+        Self::Pending
+    }
+}
+
+#[derive(Encode, Decode, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "std", derive(Debug, Serialize, Deserialize))]
+pub enum WithdrawStatus {
+	Requested,
+	Approved,
+	Rejected,
+	Completed
+}
+impl Default for WithdrawStatus {
+    fn default() -> Self {
+        Self::Requested
+    }
+}
+
+#[derive(Encode, Decode, Default, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "std", derive(Debug))]
+pub struct DepositRecord<AccountId, Balance> {
+	pub assetId: u64,
+	/// the address who send btc
+	pub from: Vec<u8>,
+	/// the account who will receive "amount" of SBTC
+	pub to: AccountId,
+    /// BTC Transaction Hash
+    pub tx_hash: Option<Vec<u8>>,
+	pub amount: Balance,
+	pub status: DepositStatus,
+}
+
+#[derive(Encode, Decode, Default, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "std", derive(Debug))]
+pub struct WithdrawRecord<AccountId, Balance> {
+	pub assetId: u64,
+    /// the account who will receive "amount" of SBTC
+	pub from: AccountId,
+	/// the btc withdraw to
+	pub to: Vec<u8>,
+    /// tx_hash is the hash of the transaction that transfers BTC into TBD
+	pub tx_hash: Option<Vec<u8>>,
+	/// SBTC 1:1 BTC
+	pub amount: Balance,
+	pub status: WithdrawStatus,
+}
 
 /// The pallet's configuration trait.
 pub trait Trait: system::Trait {
-	// TODO: Add other types and constants required configure this pallet.
-
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	type Balance: Member + Parameter + SimpleArithmetic + Default + Copy;
 }
 
 // This pallet's storage items.
 decl_storage! {
-	trait Store for Module<T: Trait> as TemplateModule {
-		// Just a dummy storage item.
-		// Here we are declaring a StorageValue, `Something` as a Option<u32>
-		// `get(fn something)` is the default getter which returns either the stored `u32` or `None` if nothing stored
-		Something get(fn something): Option<u32>;
+	trait Store for Module<T: Trait> as GenericAssetGateway {
+		// Deposit Related
+		DepositXpubKey get(deposit_xpub_key): linked_map Option<u32> => Option<H256>;
+		DepositHistory get(deposit_history) : linked_map Vec<u8> => Vec<DepositRecord<T::AccountId, T::Balance>>;
+		NextDepositIndex get(next_deposit_index): linked_map u64 => u64;
+		// Withdraw related
+		NextWithdrawId get(next_withdraw_id): u64;
+		WithdrawHistory get(withdraw_history): linked_map Option<u32> => Vec<WithdrawRecord<T::AccountId, T::Balance>>;
 	}
 }
 
@@ -38,19 +113,33 @@ decl_module! {
 		// this is needed only if you are using events in your pallet
 		fn deposit_event() = default;
 
-		// Just a dummy entry point.
-		// function that can be called by the external world as an extrinsics call
-		// takes a parameter of the type `AccountId`, stores it and emits an event
-		pub fn do_something(origin, something: u32) -> DispatchResult {
-			// TODO: You only need this if you want to check it was signed.
+		pub fn detecte_deposit(origin) -> DispatchResult {
 			let who = ensure_signed(origin)?;
+			Ok(())
+		}
+		
+		pub fn set_admin_key(origin) -> DispatchResult {
+			let who = ensure_signed(origin)?;
+			Ok(())
+		}
 
-			// TODO: Code to execute when something calls this.
-			// For example: the following line stores the passed in u32 in the storage
-			Something::put(something);
+		pub fn request_withdraw(origin) -> DispatchResult {
+			let who = ensure_signed(origin)?;
+			Ok(())
+		}
 
-			// here we are raising the Something event
-			Self::deposit_event(RawEvent::SomethingStored(something, who));
+		pub fn approve_withdraw(origin) -> DispatchResult {
+			let who = ensure_signed(origin)?;
+			Ok(())
+		}
+
+		pub fn reject_withdraw(origin) -> DispatchResult {
+			let who = ensure_signed(origin)?;
+			Ok(())
+		}
+
+		pub fn execute_withdraw(origin) -> DispatchResult {
+			let who = ensure_signed(origin)?;
 			Ok(())
 		}
 	}
@@ -61,7 +150,11 @@ decl_event!(
 		// Just a dummy event.
 		// Event `Something` is declared with a parameter of the type `u32` and `AccountId`
 		// To emit this event, we call the deposit funtion, from our runtime funtions
-		SomethingStored(u32, AccountId),
+		AssetDeposited(u32, AccountId),
+		AssetWithdrawRequested(u32, AccountId),
+		AssetWithdrawApproved(u32, AccountId),
+		AssetWithdrawRejected(u32, AccountId),
+		AssetWithdrawSuccess(u32, AccountId),
 	}
 );
 

@@ -1,3 +1,13 @@
+[dependencies.pallet-generic-asset-gateway]
+default-features = false
+path = '../frame/generic-asset-gateway'
+package = 'pallet-generic-asset-gateway'
+
+[dependencies.pallet-dexlize]
+default-features = false
+path = '../frame/dexlize'
+package = 'pallet-dexlize'
+
 [dependencies.aura]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
@@ -187,12 +197,14 @@ std = [
     'system/std',
     'timestamp/std',
     'transaction-payment/std',
+    'pallet-dexlize/std',
+    'pallet-generic-asset-gateway/std',
 ]
 
 [package]
-authors = ['Anonymous']
+authors = ['Dexlize Team<dev@dexlize.org>']
 edition = '2018'
-name = 'node-template-runtime'
+name = 'dexlize-node-runtime'
 version = '2.0.0'
 [build-dependencies.wasm-builder-runner]
 git = 'https://github.com/paritytech/substrate.git'
